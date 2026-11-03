@@ -20,6 +20,7 @@ from flask import Flask, jsonify, render_template, request, send_from_directory
 import comfy_client
 import model_manager
 import prompt_helper
+import roop_client
 
 BASE = Path(__file__).parent
 OUTPUT_DIR = BASE / "output"
@@ -514,6 +515,26 @@ def upscale():
         ))
 
 
+@app.route("/api/faceswap", methods=["POST"])
+def faceswap():
+    """Face swap (Roop-FaceSwap): multipart form with a `face` photo and a `target` image or
+    video; `enhance=1` adds GFPGAN, `many_faces=1` swaps every face instead of the first."""
+    face, target = request.files.get("face"), request.files.get("target")
+    if not face or not face.filename or not target or not target.filename:
+        return jsonify(error="A face photo and a target image or video are required."), 400
+    f = request.form
+    enhance, many = f.get("enhance") == "1", f.get("many_faces") == "1"
+    problem = roop_client.check(enhance)
+    if problem:
+        return jsonify(error=problem), 503
+    face_name, target_name = Path(face.filename).name, Path(target.filename).name
+    job = f.get("job")
+    return _run_job("faceswap", f"{face_name} → {target_name}", job, f.get("client"), lambda on_progress:
+        roop_client.swap(face_name, face.read(), target_name, target.read(),
+                         enhance=enhance, many_faces=many, job=job,
+                         timeout=int(f.get("timeout", 3600)), on_progress=on_progress))
+
+
 @app.route("/api/enhance", methods=["POST"])
 def enhance():
     """Rewrite a short prompt into a detailed one with the local LLM (Ollama)."""
@@ -596,6 +617,10 @@ def progress(job):
 @app.route("/api/cancel/<job>", methods=["POST"])
 def cancel(job):
     """Cancel a job started from this UI: dequeue it or interrupt it if running."""
+    if JOBS.get(job, {}).get("kind") == "faceswap":  # Roop runs outside ComfyUI
+        if roop_client.cancel(job):
+            return jsonify(cancelled=job)
+        return jsonify(error="That face swap isn't running."), 404
     prompt_id = JOBS.get(job, {}).get("prompt_id")
     if not prompt_id:
         return jsonify(error="That job isn't queued yet (or already finished)."), 404
@@ -616,7 +641,7 @@ OUTPUT_KINDS = [
     ("Qwen_image_2.1_gguf", "Qwen-Image"), ("Krea2_turbo_gguf", "Krea 2"),
     ("Chroma1_HD_gguf", "Chroma"), ("SDXL", "SDXL"), ("pose_map", "Pose map"),
     ("upscale", "Upscale"), ("cutout", "Cut out"), ("background_removed", "Video FX"),
-    ("smooth", "Smooth"),
+    ("smooth", "Smooth"), ("faceswap", "Face swap"),
 ]
 IMAGE_TYPES = (".png", ".jpg", ".jpeg", ".webp")
 

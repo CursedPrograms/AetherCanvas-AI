@@ -47,6 +47,8 @@ const MODES = {
               placeholder: "she slowly turns toward the camera and smiles, wind in her hair, slow push-in" },
   videofx:  { label: "", button: "Apply to video", busy: "Processing video…", icon: "◎",
               desc: "Smooth a video (RIFE in-between frames) or remove its background.", placeholder: "" },
+  faceswap: { label: "", button: "Swap face", busy: "Swapping…", icon: "☺",
+              desc: "Put a face onto a photo or video (Roop-FaceSwap).", placeholder: "" },
 };
 const NEEDS_PHOTO = ["edit", "inpaint", "uncrop", "pose", "background", "relight", "upscale"];
 // Don't mention the grey padding here: told to "fill the grey border", the model paints grey.
@@ -103,7 +105,7 @@ function updateSubModes() {
   const removing = mode === "background" && bgMode === "remove";
   for (const key of ["prompt", "settings", "models"])
     document.querySelector(`[data-section="${key}"]`).hidden =
-      removing || ["upscale", "videofx"].includes(mode);
+      removing || ["upscale", "videofx", "faceswap"].includes(mode);
   if (mode === "background") {
     $("go").textContent = removing ? "Remove background" : "Replace background";
     $("bgHint").textContent = removing ? "Cuts out the subject as a transparent PNG (BiRefNet)."
@@ -140,6 +142,35 @@ vdrop.addEventListener("drop", (e) => {
   const file = [...e.dataTransfer.files].find((f) => f.type.startsWith("video/"));
   if (file) loadVideo(file);
 });
+
+// Face Swap inputs: the face photo and the target photo or video.
+let swapFace = null, swapTarget = null, swapAll = false, swapEnhance = true;
+function loadSwap(which, file) {
+  const url = URL.createObjectURL(file);
+  if (which === "face") {
+    swapFace = file;
+    $("swapFacePreview").src = url; $("swapFacePreview").hidden = false;
+    return;
+  }
+  swapTarget = file;
+  const video = file.type.startsWith("video/");
+  $("swapTargetImg").hidden = video; $("swapTargetVideo").hidden = !video;
+  if (video) $("swapTargetVideo").src = url; else $("swapTargetImg").src = url;
+}
+for (const [which, input, drop, types] of [["face", "swapFace", "swapFaceDrop", ["image/"]],
+                                           ["target", "swapTarget", "swapTargetDrop", ["image/", "video/"]]]) {
+  $(input).addEventListener("change", () => { if ($(input).files[0]) loadSwap(which, $(input).files[0]); });
+  const zone = $(drop);
+  zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("over"); });
+  zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+  zone.addEventListener("drop", (e) => {
+    e.preventDefault(); zone.classList.remove("over");
+    const file = [...e.dataTransfer.files].find((f) => types.some((t) => f.type.startsWith(t)));
+    if (file) loadSwap(which, file);
+  });
+}
+segment("swapFacesSeg", "faces", (v) => { swapAll = v === "all"; });
+segment("swapEnhanceSeg", "enhance", (v) => { swapEnhance = v === "1"; });
 
 // Upscale factor (2x / 4x segmented control).
 document.querySelectorAll("#scaleSeg .seg-btn").forEach((b) => b.addEventListener("click", () => {
@@ -664,6 +695,15 @@ async function buildRequest(prompt, job) {
     return ["/api/background", { method: "POST", body: form }];
   }
   if (mode === "videofx") return videoFxRequest(videoBlob, videoName, job, fxMode);
+  if (mode === "faceswap") {
+    const swap = new FormData();
+    swap.append("face", swapFace, swapFace.name);
+    swap.append("target", swapTarget, swapTarget.name);
+    swap.append("enhance", swapEnhance ? "1" : "0");
+    swap.append("many_faces", swapAll ? "1" : "0");
+    swap.append("job", job); swap.append("client", clientId);
+    return ["/api/faceswap", { method: "POST", body: swap }];
+  }
   if (mode === "video") {
     const [w, h] = videoSize();
     form.append("width", w); form.append("height", h);
@@ -715,6 +755,11 @@ $("form").addEventListener("submit", async (e) => {
   if (mode === "videofx") {
     if (!videoBlob) return fail("Choose a video first.");
     prompt = fxMode === "smooth" ? `${videoName} ×${$("multiplier").value} smooth` : `${videoName}: remove background`;
+  }
+  if (mode === "faceswap") {
+    if (!swapFace) return fail("Choose the face photo first.");
+    if (!swapTarget) return fail("Choose the photo or video to put it on.");
+    prompt = `${swapFace.name} → ${swapTarget.name}`;
   }
   if (!prompt) return fail(mode === "edit" ? "Enter an edit instruction first." : "Enter a prompt first.");
   msg.className = ""; msg.textContent = "";
