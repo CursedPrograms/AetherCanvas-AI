@@ -33,11 +33,18 @@ def _python():
     return None
 
 
+def _installed():
+    """Roop's packages are really in its venv (setup.bat's .requirements marker can outlive them)."""
+    venv = ROOP_DIR / "psdenv"
+    sites = [venv / "Lib" / "site-packages", *venv.glob("lib/python3*/site-packages")]
+    return any(all((s / pkg).is_dir() for pkg in ("onnxruntime", "insightface")) for s in sites)
+
+
 def check(enhance):
     """Why Face Swap can't run yet, or None."""
     if not (ROOP_DIR / "run.py").exists():
         return f"Roop-FaceSwap isn't in {ROOP_DIR} (set ROOP_DIR)."
-    if not _python() or not (ROOP_DIR / "psdenv" / ".requirements").exists():  # setup.bat writes it after pip
+    if not _python() or not _installed():
         return f"Roop-FaceSwap isn't set up yet: run setup.bat in {ROOP_DIR} once."
     need = [SWAPPER] + ([ENHANCER] if enhance else [])
     missing = [n for n in need if not (MODELS / n).exists()]
