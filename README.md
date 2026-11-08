@@ -45,7 +45,7 @@ optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
   video result has a **smooth** link), or remove a video's background (green / blue screen,
   black, white).
 - **Face Swap** — put a face from one photo onto another photo or a video, with
-  [Changeling](https://github.com/CursedPrograms/Changeling) (optional, its own repo and venv;
+  [Changeling CopyCat](https://github.com/CursedPrograms/Changeling-CopyCat) (optional, its own repo and venv;
   its NSFW check stays on).
 - **Video** — bring a photo to life, or make a video from a prompt alone, with **Wan 2.2**
   TI2V-5B (optional): 2–5 seconds at 24 fps, sized to the photo's shape. A second video model,
@@ -311,8 +311,8 @@ a 6 GB card (layers are swapped through system RAM).
 
 ### Face Swap (optional)
 
-The Face Swap tool runs [Changeling](https://github.com/CursedPrograms/Changeling) from its own
-folder (`CHANGELING_DIR`, default `D:\cc\Changeling`) in its own venv, so its packages (PyTorch,
+The Face Swap tool runs [Changeling CopyCat](https://github.com/CursedPrograms/Changeling-CopyCat) from its own
+folder (`CHANGELING_DIR`, default `D:\cc\Changeling-CopyCat`) in its own venv, so its packages (PyTorch,
 TensorFlow, insightface) never touch this one. Set it up once with Changeling's `setup.bat`, then get
 **Changeling face swap** on the Models page: its two files go in this repo's `models/changeling/`, which the
 AetherCanvas hands to Changeling as `CHANGELING_MODELS_DIR`. Changeling fetches its face finder (buffalo_l, 0.29 GB) on
