@@ -328,3 +328,11 @@ main.models-mode > .panel, main.models-mode > .gallery-wrap { display: none; }
 .g-label b { color: var(--text); font-weight: 650; font-size: 12.5px; }
 .g-label small { font: 11px var(--mono); color: var(--muted); }
 .more-btn { display: block; margin: 18px auto 0; padding: 9px 22px; }
+
+/* Quick edits (Edit mode): one-click instructions */
+.quick { margin-top: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.quick-row { margin-top: 8px; }
+.quick-name { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+.chip { width: auto; flex: 0 0 auto; padding: 5px 11px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); color: var(--text); font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+.chip:hover { border-color: var(--accent, #e0408a); }

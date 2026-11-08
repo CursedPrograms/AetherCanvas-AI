@@ -53,11 +53,170 @@ const NEEDS_PHOTO = ["edit", "inpaint", "uncrop", "pose", "background", "relight
 const UNCROP_DEFAULT = "Extend the photo outward, seamlessly continuing the scene, with the same " +
   "lighting, perspective, colours and photographic style.";
 
+// Quick options: one click writes a ready instruction into the prompt (still yours to change).
+// "set" replaces the prompt; "add" appends to what's there (styles for Generate).
+const QUICK = {
+  generate: { how: "add", hint: "Styles, one click: added to your prompt", groups: {
+    Style: [["Photo", "photorealistic, natural light, 35mm photo, sharp focus"],
+            ["Cinematic", "cinematic film still, dramatic lighting, shallow depth of field, anamorphic"],
+            ["Portrait", "studio portrait, soft key light, 85mm lens, detailed skin"],
+            ["Anime", "anime style, clean line art, vibrant cel shading"],
+            ["Watercolour", "watercolour painting, soft washes, paper texture"],
+            ["Oil painting", "oil painting, visible brush strokes, rich colour"],
+            ["Pencil sketch", "graphite pencil sketch, cross-hatching, white paper"],
+            ["3D render", "3D render, soft global illumination, high detail"],
+            ["Pixel art", "pixel art, 16-bit, crisp pixels, limited palette"],
+            ["Neon", "neon-lit, cyberpunk, glowing pink and cyan lights, night"],
+            ["Black & white", "black and white photograph, high contrast, film grain"]],
+    Shot: [["Close-up", "close-up shot"], ["Full body", "full body shot"], ["Wide", "wide establishing shot"],
+           ["From above", "seen from above, top-down view"], ["Low angle", "low angle shot, looking up"]] } },
+  edit: { how: "set", hint: "One click writes the instruction; press Edit to run it", groups: {
+    "Hair length": [["Long", "Make the hair long, flowing past the shoulders, same colour and texture"],
+                    ["Shoulder length", "Make the hair shoulder-length, same colour and texture"],
+                    ["Bob", "Give a chin-length bob haircut, same hair colour"],
+                    ["Short", "Make the hair short, a short cropped haircut, same hair colour"],
+                    ["Pixie", "Give a pixie cut, same hair colour"],
+                    ["Shaved", "Make the head shaved bald"]],
+    "Hair style": [["Bangs", "Add straight bangs across the forehead, same hair colour"],
+                   ["Curly", "Make the hair curly, same length and colour"],
+                   ["Wavy", "Make the hair softly wavy, same length and colour"],
+                   ["Straight", "Make the hair sleek and straight, same length and colour"],
+                   ["Ponytail", "Tie the hair back into a high ponytail"],
+                   ["Bun", "Put the hair up in a neat bun"],
+                   ["Braids", "Style the hair in long braids"]],
+    "Hair colour": [["Blonde", "Change the hair colour to golden blonde, keep the style"],
+                    ["Platinum", "Change the hair colour to platinum blonde, keep the style"],
+                    ["Red", "Change the hair colour to copper red, keep the style"],
+                    ["Black", "Change the hair colour to jet black, keep the style"],
+                    ["Brown", "Change the hair colour to chocolate brown, keep the style"],
+                    ["Silver", "Change the hair colour to silver grey, keep the style"],
+                    ["Pink", "Change the hair colour to pastel pink, keep the style"],
+                    ["Blue", "Change the hair colour to electric blue, keep the style"]],
+    Face: [["Smile", "Make the person smile naturally, keep everything else the same"],
+           ["Neutral", "Give the person a calm, neutral expression"],
+           ["Natural makeup", "Add subtle natural makeup: light foundation, soft blush, mascara, nude lips"],
+           ["Glam makeup", "Add glamorous evening makeup: smoky eyes, winged eyeliner, red lipstick"],
+           ["No makeup", "Remove all makeup, natural bare skin"],
+           ["Add beard", "Give the man a full, well-groomed beard"],
+           ["Clean shaven", "Make the face clean shaven, no beard or stubble"],
+           ["Glasses", "Add stylish black-rimmed glasses"],
+           ["No glasses", "Remove the glasses"],
+           ["Freckles", "Add light natural freckles across the nose and cheeks"]],
+    Age: [["Younger", "Make the person look about 15 years younger, same identity"],
+          ["Older", "Make the person look about 25 years older, same identity"],
+          ["Child", "Show the same person as a young child"],
+          ["Elderly", "Show the same person in their eighties, grey hair and wrinkles"]],
+    Outfit: [["Evening gown", "Change the outfit to an elegant red evening gown"],
+             ["Black suit", "Change the outfit to a tailored black suit with a white shirt"],
+             ["Leather jacket", "Change the outfit to a black leather jacket over a white t-shirt"],
+             ["Hoodie", "Change the outfit to a casual grey hoodie"],
+             ["Summer dress", "Change the outfit to a light floral summer dress"],
+             ["Business", "Change the outfit to smart business clothes"],
+             ["Armour", "Change the outfit to fantasy knight armour"]],
+    Scene: [["Night", "Make it night time, with city lights"], ["Snow", "Make it snowing, snow on the ground"],
+            ["Rain", "Make it raining, wet reflective surfaces"],
+            ["Golden hour", "Change the light to warm golden hour sunlight"],
+            ["Remove people", "Remove the people in the background, keep the main subject"],
+            ["Tidy up", "Remove the clutter from the background"]],
+    "Art style": [["Watercolour", "Turn the photo into a watercolour painting"],
+                  ["Anime", "Turn the photo into an anime illustration"],
+                  ["Pencil sketch", "Turn the photo into a pencil sketch"],
+                  ["Oil painting", "Turn the photo into an oil painting"],
+                  ["3D cartoon", "Turn the photo into a 3D animated cartoon character style"],
+                  ["Black & white", "Turn the photo into a black and white photograph"],
+                  ["Vintage", "Make it look like a faded 1970s film photograph"]] } },
+  inpaint: { how: "set", hint: "For the painted area", groups: {
+    Fill: [["Remove it", "empty background, seamlessly continuing the surroundings"],
+           ["Flowers", "a bunch of colourful flowers"], ["Red dress", "a red evening gown"],
+           ["Sunglasses", "black sunglasses"], ["Tattoo", "a fine-line floral tattoo"],
+           ["Blue sky", "clear blue sky"]] } },
+  uncrop: { how: "set", hint: "What the wider picture shows", groups: {
+    Scene: [["Same scene", ""], ["Beach", "a sunlit beach with palm trees"], ["City", "a busy city street"],
+            ["Forest", "a green forest"], ["Studio", "a plain grey photo studio backdrop"],
+            ["Room", "a cosy living room"]] } },
+  pose: { how: "set", hint: "Who or what in this pose", groups: {
+    Subject: [["Astronaut", "an astronaut in a white spacesuit on the moon, cinematic light"],
+              ["Knight", "a knight in shining armour in a castle courtyard"],
+              ["Dancer", "a ballet dancer on a stage, spotlight"],
+              ["Superhero", "a superhero in a colourful suit on a rooftop at night"],
+              ["Anime girl", "an anime girl in a school uniform, cherry blossoms"],
+              ["Robot", "a sleek humanoid robot in a futuristic lab"]] } },
+  background: { how: "set", hint: "A new background (leave empty to just cut out)", groups: {
+    Place: [["Beach", "a sunlit beach at golden hour, palm trees, soft bokeh"],
+            ["City night", "a city street at night, neon lights, bokeh"],
+            ["Studio grey", "a plain grey photo studio backdrop, soft light"],
+            ["Studio white", "a clean white studio backdrop"],
+            ["Forest", "a green forest with sunbeams"], ["Office", "a bright modern office"],
+            ["Mountains", "snowy mountains under a blue sky"], ["Space", "a colourful space nebula with stars"],
+            ["Cyberpunk", "a rainy cyberpunk alley with pink and cyan neon"]] } },
+  relight: { how: "set", hint: "The new light", groups: {
+    Light: [["Golden hour", "warm golden-hour sunlight from the left, long soft shadows"],
+            ["Window", "soft daylight from a window on the right"],
+            ["Studio", "clean studio softbox lighting from the front"],
+            ["Neon", "pink and blue neon light from both sides"],
+            ["Candlelight", "warm flickering candlelight from below"],
+            ["Moonlight", "cool blue moonlight from above"],
+            ["Rim light", "dramatic rim light from behind, dark background"],
+            ["Overcast", "soft overcast daylight, no harsh shadows"],
+            ["Sunset", "deep orange sunset light from behind"]] } },
+  video: { how: "set", hint: "The motion", groups: {
+    Motion: [["Turn & smile", "she slowly turns toward the camera and smiles, slow push-in"],
+             ["Wind", "wind gently moves the hair and clothes, subtle breathing"],
+             ["Look around", "blinks and looks around curiously, small head movements"],
+             ["Walk", "walks slowly toward the camera"],
+             ["Laugh", "laughs naturally, shoulders moving"],
+             ["Wave", "smiles and waves at the camera"],
+             ["Dance", "dances gracefully to music"]],
+    Camera: [["Push in", "slow camera push-in"], ["Orbit", "the camera slowly orbits around the subject"],
+             ["Pan", "slow camera pan from left to right"], ["Still", "static camera, only the subject moves"]],
+    Scene: [["Rain", "rain falling, wet reflections"], ["Snow", "snow gently falling"],
+            ["Fire", "flickering firelight, embers drifting"], ["Water", "gentle waves rolling in"]] } },
+};
+
+function renderQuick(m) {
+  const q = QUICK[m];
+  $("quickEdits").hidden = !q;
+  if (!q) return;
+  $("quickHint").textContent = q.hint;
+  const box = $("quickGroups");
+  box.textContent = "";
+  for (const [group, items] of Object.entries(q.groups)) {
+    const row = document.createElement("div");
+    row.className = "quick-row";
+    const name = document.createElement("span");
+    name.className = "quick-name";
+    name.textContent = group;
+    row.append(name);
+    const chips = document.createElement("div");
+    chips.className = "chips";
+    for (const [label, text] of items) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "chip";
+      chip.textContent = label;
+      chip.title = text || "the photo's own scene, continued";
+      chip.addEventListener("click", () => {
+        const p = $("prompt");
+        if (q.how === "add" && p.value.trim()) {
+          p.value = p.value.trim().replace(/[,.\s]+$/, "") + ", " + text;
+        } else {
+          p.value = text;
+        }
+        p.focus();
+      });
+      chips.append(chip);
+    }
+    row.append(chips);
+    box.append(row);
+  }
+}
+
 function setMode(m) {
   mode = m;
   $("modeSelect").value = m;
   $("modeIcon").textContent = MODES[m].icon;
   $("modeDesc").textContent = MODES[m].desc;
+  renderQuick(m);
   document.querySelectorAll("[data-modes]").forEach((el) => {
     el.hidden = !el.dataset.modes.split(" ").includes(m) || (el.id === "preview" && !photo);
   });
@@ -1139,3 +1298,4 @@ richSelect($("videoModel"), (v) => FAMILIES[v]);
 
 // Open the page named in the URL (#models / #gallery) once everything above exists.
 if (location.hash === "#models" || location.hash === "#gallery") setView(location.hash.slice(1));
+

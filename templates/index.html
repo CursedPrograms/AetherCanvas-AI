@@ -195,6 +195,10 @@
           <button type="button" class="small" id="enhance" title="Rewrite the prompt with the local LLM (Ollama)">&#10024; Enhance</button>
         </div>
         <textarea id="prompt" rows="4" aria-labelledby="promptLabel" placeholder="a watercolour lighthouse on a rocky coast at dusk">{{ config.Example or "" }}</textarea>
+        <div id="quickEdits" class="quick" hidden>
+          <span class="hint" id="quickHint"></span>
+          <div id="quickGroups"></div>
+        </div>
         <div id="negativeBox">
           <label for="negative">Negative prompt <span class="hint">(only used when CFG &gt; 1)</span></label>
           <textarea id="negative" rows="2" placeholder="blurry, low quality"></textarea>

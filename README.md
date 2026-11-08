@@ -375,6 +375,20 @@ size & quality, models) folds open and closed, and **«** hides the whole panel 
 gets the full width; the page remembers both. Click an image to see it full size.
 The **Project page ↗** link in the header opens the [GitHub Pages site](https://cursedprograms.github.io/AetherCanvas-AI/).
 
+**Quick options:** under the prompt, every tool has one-click options that write a ready instruction
+for you (change the words if you like, then run it):
+
+| Tool | Quick options |
+| --- | --- |
+| Generate | styles (photo, cinematic, portrait, anime, watercolour, oil, sketch, 3D, pixel art, neon, black & white) and shots (close-up, full body, wide, from above, low angle), added to your prompt |
+| Edit photo | hair length (long, shoulder length, bob, short, pixie, shaved), hair style (bangs, curly, wavy, straight, ponytail, bun, braids), hair colour, face (smile, makeup on or off, beard, glasses, freckles), age, outfit, scene (night, snow, rain, golden hour, remove people, tidy up), art style |
+| Inpaint | remove it, flowers, a dress, sunglasses, a tattoo, blue sky |
+| Uncrop | same scene, beach, city, forest, studio, room |
+| Pose | astronaut, knight, dancer, superhero, anime girl, robot |
+| Background | beach, city at night, grey or white studio, forest, office, mountains, space, cyberpunk |
+| Relight | golden hour, window, studio, neon, candlelight, moonlight, rim light, overcast, sunset |
+| Video | motion (turn and smile, wind, look around, walk, laugh, wave, dance), camera (push in, orbit, pan, still), scene (rain, snow, fire, water) |
+
 - **Generate** — prompt, size, steps, CFG, batch, seed. **Model** switches between Qwen-Image 2.1
   and Krea 2 Turbo (steps jump to 8 and the negative prompt is hidden, since Turbo runs at CFG 1).
 - **Edit photo** — choose a photo, then type an instruction such as *"change the dress to a red
