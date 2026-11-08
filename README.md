@@ -381,7 +381,7 @@ for you (change the words if you like, then run it):
 | Tool | Quick options |
 | --- | --- |
 | Generate | styles (photo, cinematic, portrait, anime, watercolour, oil, sketch, 3D, pixel art, neon, black & white) and shots (close-up, full body, wide, from above, low angle), added to your prompt |
-| Edit photo | hair length (long, shoulder length, bob, short, pixie, shaved), hair style (bangs, curly, wavy, straight, ponytail, bun, braids), hair colour, face (smile, makeup on or off, beard, glasses, freckles), age, outfit, scene (night, snow, rain, golden hour, remove people, tidy up), art style |
+| Edit photo | hair length (long, shoulder length, bob, short, pixie, shaved), hair style (bangs, curly, wavy, straight, ponytail, bun, braids), hair colour, face (smile, beard, glasses), makeup (natural, glam, smoky eyes, winged liner, red, nude or berry lips, glow, soft glam, gothic, bridal, freckles, no makeup), age, outfit, scene (night, snow, rain, golden hour, remove people, tidy up), art style |
 | Inpaint | remove it, flowers, a dress, sunglasses, a tattoo, blue sky |
 | Uncrop | same scene, beach, city, forest, studio, room |
 | Pose | astronaut, knight, dancer, superhero, anime girl, robot |
