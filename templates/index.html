@@ -66,7 +66,6 @@
         <option value="upscale">Upscale</option>
         <option value="video">Video</option>
         <option value="videofx">Video FX</option>
-        <option value="faceswap">Face Swap</option>
       </select>
     </div>
     <p class="mode-desc" id="modeDesc"></p>
@@ -187,37 +186,7 @@
       </div>
     </details>
 
-    <details class="section" data-section="faceswap" data-modes="faceswap" open hidden>
-      <summary>Faces</summary>
-      <div class="section-body">
-        <label>Face to use</label>
-        <label class="drop" for="swapFace" id="swapFaceDrop">
-          <input id="swapFace" type="file" accept="image/*">
-          <span class="drop-text"><b>Choose a face photo</b> or drop it here</span>
-        </label>
-        <img id="swapFacePreview" class="preview" alt="" hidden>
-        <label>Put it on</label>
-        <label class="drop" for="swapTarget" id="swapTargetDrop">
-          <input id="swapTarget" type="file" accept="image/*,video/*">
-          <span class="drop-text"><b>Choose a photo or video</b> or drop it here</span>
-        </label>
-        <img id="swapTargetImg" class="preview" alt="" hidden>
-        <video id="swapTargetVideo" class="preview" controls muted loop playsinline hidden></video>
-        <label>Faces</label>
-        <div class="seg" id="swapFacesSeg">
-          <button type="button" class="seg-btn active" data-faces="one">The main one</button>
-          <button type="button" class="seg-btn" data-faces="all">Every face</button>
-        </div>
-        <label>Clean-up</label>
-        <div class="seg" id="swapEnhanceSeg">
-          <button type="button" class="seg-btn active" data-enhance="1">GFPGAN</button>
-          <button type="button" class="seg-btn" data-enhance="0">Off (faster)</button>
-        </div>
-        <div class="hint">Runs Changeling from its own folder. A photo takes seconds; a video is done frame by frame. Changeling's NSFW check stays on.</div>
-      </div>
-    </details>
-
-    <details class="section" data-section="prompt" data-not-modes="upscale videofx faceswap" open>
+    <details class="section" data-section="prompt" data-not-modes="upscale videofx" open>
       <summary id="promptLabel">Prompt</summary>
       <div class="section-body">
         <div class="label-row">
@@ -268,7 +237,7 @@
       </div>
     </details>
 
-    <details class="section" data-section="settings" data-not-modes="upscale videofx faceswap" open>
+    <details class="section" data-section="settings" data-not-modes="upscale videofx" open>
       <summary>Size &amp; quality</summary>
       <div class="section-body">
         <div data-modes="generate">
@@ -317,7 +286,7 @@
       </div>
     </details>
 
-    <details class="section" data-section="models" data-not-modes="upscale videofx faceswap">
+    <details class="section" data-section="models" data-not-modes="upscale videofx">
       <summary>Models &amp; LoRA</summary>
       <div class="section-body">
         <label for="unet">Diffusion model (GGUF)</label>

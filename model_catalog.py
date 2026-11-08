@@ -118,16 +118,6 @@ CATALOG = [
      "files": [
          hf("Kim2091/UltraSharpV2", "4x-UltraSharpV2.safetensors", "upscale_models", 139792588),
      ]},
-    {"id": "changeling", "name": "Changeling face swap", "kind": "Tool", "base": False,
-     "license": "Non-commercial research (insightface inswapper)",
-     "note": "The Face Swap tool: inswapper puts a face onto a photo or video; GFPGAN cleans the "
-             "face up afterwards. Runs in Changeling's own venv, which also fetches its face "
-             "finder (buffalo_l) the first time.",
-     "files": [
-         hf("CountFloyd/deepfake", "inswapper_128.onnx", "changeling", 554253681),
-         {"url": "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth",
-          "name": "GFPGANv1.4.pth", "folder": "changeling", "size": 348632874, "repo": "TencentARC/GFPGAN"},
-     ]},
 ]
 
 BY_ID = {m["id"]: m for m in CATALOG}

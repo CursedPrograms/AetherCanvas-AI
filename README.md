@@ -44,9 +44,6 @@ optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
 - **Video FX** — smooth any video with **RIFE** in-between frames (2–4× the frame rate; every
   video result has a **smooth** link), or remove a video's background (green / blue screen,
   black, white).
-- **Face Swap** — put a face from one photo onto another photo or a video, with
-  [Changeling CopyCat](https://github.com/CursedPrograms/Changeling-CopyCat) (optional, its own repo and venv;
-  its NSFW check stays on).
 - **Video** — bring a photo to life, or make a video from a prompt alone, with **Wan 2.2**
   TI2V-5B (optional): 2–5 seconds at 24 fps, sized to the photo's shape. A second video model,
   **Wan 2.2 I2V-A14B (test)**, is tuned for faces and identity (photo to video only).
@@ -309,20 +306,6 @@ older Wan 2.1 one, which is a different file from the 5B model's `wan2.2_vae`. I
 16 fps in 4 steps, split between two 14B experts, so expect it to be slower than the 5B model on
 a 6 GB card (layers are swapped through system RAM).
 
-### Face Swap (optional)
-
-The Face Swap tool runs [Changeling CopyCat](https://github.com/CursedPrograms/Changeling-CopyCat) from its own
-folder (`CHANGELING_DIR`, default `D:\cc\Changeling-CopyCat`) in its own venv, so its packages (PyTorch,
-TensorFlow, insightface) never touch this one. Set it up once with Changeling's `setup.bat`, then get
-**Changeling face swap** on the Models page: its two files go in this repo's `models/changeling/`, which the
-AetherCanvas hands to Changeling as `CHANGELING_MODELS_DIR`. Changeling fetches its face finder (buffalo_l, 0.29 GB) on
-the first swap.
-
-| File | Size | From | License |
-| --- | --- | --- | --- |
-| `inswapper_128.onnx` | 0.55 GB | [CountFloyd/deepfake](https://huggingface.co/CountFloyd/deepfake) | non-commercial research |
-| `GFPGANv1.4.pth` | 0.35 GB | [TencentARC/GFPGAN](https://github.com/TencentARC/GFPGAN/releases/tag/v1.3.4) | Apache 2.0 |
-
 ### Pose and Upscale models
 
 Both run on ComfyUI's own nodes (no custom nodes); they only need two files in this repo's
@@ -424,10 +407,6 @@ The **Project page ↗** link in the header opens the [GitHub Pages site](https:
 - **Video FX** — choose (or drop) a video. **Smooth** adds in-between frames with RIFE (2× turns
   the face model's 16 fps into 32). **Remove background** runs BiRefNet on every frame and puts
   the subject on green, blue, black or white. Short clips work best.
-
-- **Face Swap** — choose the face photo and the photo or video to put it on. **The main one**
-  swaps the first face found; **Every face** swaps them all. **GFPGAN** cleans the new face up
-  (slower on video). Changeling's NSFW check stays on: a flagged target is refused.
 
 - **Upscale** — choose a photo and **2×** or **4×**. No prompt; it adds detail rather than just
   pixels. Faster: click **upscale** under any image result (2×). Large results open from
@@ -638,10 +617,6 @@ model (test), which needs `image`. `/api/generate` takes `model` = `qwen`, `krea
 picture), plus optional `resolution` (1024), `negative`, `steps`, `cfg`, `seed`, `unet`, `clip`,
 `lora`, `lora_strength`, `job`, `client`, `timeout`. Same response as `/api/generate`; `images`
 holds the result and the `pose_map_*.png` skeleton.
-
-**`POST /api/faceswap`** — multipart form: `face` (photo) and `target` (photo or video), plus
-optional `enhance` (`1`: GFPGAN), `many_faces` (`1`: every face), `job`, `client`, `timeout`.
-Runs Changeling; 503 until it and its models are installed. `/api/cancel/<job>` stops it.
 
 **`POST /api/upscale`** — multipart form: `image`, `scale` (`2` or `4`, default 2) and `quality`
 (`fast`: UltraSharp V2 Lite, ~10 s; `best`: the full V2, minutes per image), plus
