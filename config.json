@@ -1,6 +1,6 @@
 {
   "Config": {
-    "AppName": "AI Visual Workshop",
+    "AppName": "AetherCanvas AI",
     "Description": "One local web app and JSON API for visual AI: text-to-image (Qwen-Image 2.1 or Krea 2 Turbo), photo editing, masked inpainting, uncropping and video (Wan 2.2) with GGUF models, driving a running ComfyUI backend.",
     "Example": "a watercolour lighthouse on a rocky coast at dusk",
     "Backend": "ComfyUI (http://127.0.0.1:8188)",

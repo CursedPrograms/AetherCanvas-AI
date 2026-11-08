@@ -1,4 +1,4 @@
-"""Minimal ComfyUI client for the AI Visual Workshop workflows.
+"""Minimal ComfyUI client for the AetherCanvas AI workflows.
 
 Queues the API-format graph (text-to-image, image edit, masked inpaint of an
 uploaded photo, or a Wan 2.2 video) on a running ComfyUI server, waits for the job

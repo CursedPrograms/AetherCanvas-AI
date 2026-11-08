@@ -2,7 +2,7 @@
 # the weights from this repo's models/ folder instead of its own.
 # Edit base_path to the absolute path of this repo's models/ directory.
 qwen_image_gguf:
-    base_path: C:/cc/AI-Visual-Workshop/models
+    base_path: C:/cc/AetherCanvas-AI/models
     diffusion_models: diffusion_models
     unet: diffusion_models
     text_encoders: text_encoders

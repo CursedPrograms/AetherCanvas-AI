@@ -1,11 +1,11 @@
-# AI Visual Workshop — vision
+# AetherCanvas AI — vision
 
 **One local repo. One web app. Every visual-AI task in one place — no googling, no
 tool-hopping.** A single front end (this Flask app) drives one ComfyUI backend, with a
 tab for each capability. Local, offline, uncensored, on your own GPU.
 
 ```
-          ┌─────────────────────  AI Visual Workshop (Flask UI + API)  ─────────────────────┐
+          ┌─────────────────────  AetherCanvas AI (Flask UI + API)  ─────────────────────┐
 browser ─▶│  Generate │ Edit │ Inpaint │ Outpaint │ Upscale │ Restyle │ Video │ Models      │
           └──────────────────────────────────┬────────────────────────────────────────────┘
                                               │ HTTP (comfy_client)
@@ -57,8 +57,8 @@ browser ─▶│  Generate │ Edit │ Inpaint │ Outpaint │ Upscale │ Re
 
 ## Open decisions
 
-- **Repo identity:** decided 2026-10-13: *this* repo became the Workshop, renamed from
-  `Qwen-Image-2.1-Uncensored-GGUF` to `AI-Visual-Workshop`. Qwen-Image is module #1, and
+- **Repo identity:** decided 2026-10-13: *this* repo became AetherCanvas, renamed from
+  `Qwen-Image-2.1-Uncensored-GGUF` to `AetherCanvas-AI`. Qwen-Image is module #1, and
   Video (Wan 2.2 TI2V-5B) is module #2.
-- **Relation to the ecosystem:** the Workshop is the visual service DREAM/Friday call for
+- **Relation to the ecosystem:** AetherCanvas is the visual service DREAM/Friday call for
   "dreaming" (see that project), announced on the LAN as `qwen.flask`.

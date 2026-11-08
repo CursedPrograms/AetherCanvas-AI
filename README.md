@@ -14,7 +14,7 @@
 
 ---
 
-# AI Visual Workshop
+# AetherCanvas AI
 
 **One local web app for visual AI.** A **Flask server** — web UI and JSON API — for text-to-image
 generation, instruction-based photo editing, masked inpainting, uncropping and **video**, with GGUF
@@ -22,7 +22,7 @@ models on your own GPU, and the ComfyUI workflows it runs on: Qwen-Image 2.1 (fr
 [abenzerps/Qwen-Image-2.1-Uncensored-GGUF](https://huggingface.co/abenzerps/Qwen-Image-2.1-Uncensored-GGUF)),
 optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
 
-**Site:** [cursedprograms.github.io/AI-Visual-Workshop](https://cursedprograms.github.io/AI-Visual-Workshop/)
+**Site:** [cursedprograms.github.io/AetherCanvas-AI](https://cursedprograms.github.io/AetherCanvas-AI/)
 · formerly *Qwen-Image-2.1-Uncensored-GGUF*.
 
 - **Generate** — text to image with Qwen-Image 2.1, **Krea 2 Turbo** (8 steps), **SDXL**
@@ -45,7 +45,7 @@ optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
   video result has a **smooth** link), or remove a video's background (green / blue screen,
   black, white).
 - **Face Swap** — put a face from one photo onto another photo or a video, with
-  [Roop-FaceSwap](https://github.com/CursedPrograms/Roop-FaceSwap) (optional, its own repo and venv;
+  [Changeling](https://github.com/CursedPrograms/Changeling) (optional, its own repo and venv;
   its NSFW check stays on).
 - **Video** — bring a photo to life, or make a video from a prompt alone, with **Wan 2.2**
   TI2V-5B (optional): 2–5 seconds at 24 fps, sized to the photo's shape. A second video model,
@@ -62,7 +62,7 @@ optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
   finished results are still there.
 
 <p align="center">
-  <img src="docs/ui-studio.jpg" alt="The Workshop: tool panel and gallery" width="100%">
+  <img src="docs/ui-studio.jpg" alt="AetherCanvas: tool panel and gallery" width="100%">
 </p>
 
 | | | |
@@ -224,7 +224,7 @@ so ComfyUI reads the weights in place:
 
 ```yaml
 qwen_image_gguf:
-    base_path: C:/cc/AI-Visual-Workshop/models
+    base_path: C:/cc/AetherCanvas-AI/models
     diffusion_models: diffusion_models
     unet: diffusion_models
     text_encoders: text_encoders
@@ -290,7 +290,7 @@ Q6_K and Q8_0 of the model (and Q8_0 of the encoder) work too; pick them under *
 
 All of these can be downloaded from the **Models** page (header → **Models**), which also shows
 what is installed. The files go into this repo's `models/` (`MODELS_DIR`), which ComfyUI already
-reads, so they appear after a page reload. Base models are the Workshop's standard set; optional
+reads, so they appear after a page reload. Base models are AetherCanvas's standard set; optional
 ones are extras.
 
 | Model | Kind | Files | Size | License |
@@ -311,11 +311,11 @@ a 6 GB card (layers are swapped through system RAM).
 
 ### Face Swap (optional)
 
-The Face Swap tool runs [Roop-FaceSwap](https://github.com/CursedPrograms/Roop-FaceSwap) from its own
-folder (`ROOP_DIR`, default `D:\cc\Roop-FaceSwap`) in its own venv, so its packages (PyTorch,
-TensorFlow, insightface) never touch this one. Set it up once with Roop's `setup.bat`, then get
-**Roop face swap** on the Models page: its two files go in this repo's `models/roop/`, which the
-Workshop hands to Roop as `ROOP_MODELS_DIR`. Roop fetches its face finder (buffalo_l, 0.29 GB) on
+The Face Swap tool runs [Changeling](https://github.com/CursedPrograms/Changeling) from its own
+folder (`CHANGELING_DIR`, default `D:\cc\Changeling`) in its own venv, so its packages (PyTorch,
+TensorFlow, insightface) never touch this one. Set it up once with Changeling's `setup.bat`, then get
+**Changeling face swap** on the Models page: its two files go in this repo's `models/changeling/`, which the
+AetherCanvas hands to Changeling as `CHANGELING_MODELS_DIR`. Changeling fetches its face finder (buffalo_l, 0.29 GB) on
 the first swap.
 
 | File | Size | From | License |
@@ -390,7 +390,7 @@ pickers, hover (or arrow to) a model to see a card about it: what it's best at, 
 and whether it's installed. Each part of the form (photo, prompt,
 size & quality, models) folds open and closed, and **«** hides the whole panel so the gallery
 gets the full width; the page remembers both. Click an image to see it full size.
-The **Project page ↗** link in the header opens the [GitHub Pages site](https://cursedprograms.github.io/AI-Visual-Workshop/).
+The **Project page ↗** link in the header opens the [GitHub Pages site](https://cursedprograms.github.io/AetherCanvas-AI/).
 
 - **Generate** — prompt, size, steps, CFG, batch, seed. **Model** switches between Qwen-Image 2.1
   and Krea 2 Turbo (steps jump to 8 and the negative prompt is hidden, since Turbo runs at CFG 1).
@@ -427,7 +427,7 @@ The **Project page ↗** link in the header opens the [GitHub Pages site](https:
 
 - **Face Swap** — choose the face photo and the photo or video to put it on. **The main one**
   swaps the first face found; **Every face** swaps them all. **GFPGAN** cleans the new face up
-  (slower on video). Roop's NSFW check stays on: a flagged target is refused.
+  (slower on video). Changeling's NSFW check stays on: a flagged target is refused.
 
 - **Upscale** — choose a photo and **2×** or **4×**. No prompt; it adds detail rather than just
   pixels. Faster: click **upscale** under any image result (2×). Large results open from
@@ -641,7 +641,7 @@ holds the result and the `pose_map_*.png` skeleton.
 
 **`POST /api/faceswap`** — multipart form: `face` (photo) and `target` (photo or video), plus
 optional `enhance` (`1`: GFPGAN), `many_faces` (`1`: every face), `job`, `client`, `timeout`.
-Runs Roop-FaceSwap; 503 until it and its models are installed. `/api/cancel/<job>` stops it.
+Runs Changeling; 503 until it and its models are installed. `/api/cancel/<job>` stops it.
 
 **`POST /api/upscale`** — multipart form: `image`, `scale` (`2` or `4`, default 2) and `quality`
 (`fast`: UltraSharp V2 Lite, ~10 s; `best`: the full V2, minutes per image), plus

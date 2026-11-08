@@ -48,7 +48,7 @@ const MODES = {
   videofx:  { label: "", button: "Apply to video", busy: "Processing video…", icon: "◎",
               desc: "Smooth a video (RIFE in-between frames) or remove its background.", placeholder: "" },
   faceswap: { label: "", button: "Swap face", busy: "Swapping…", icon: "☺",
-              desc: "Put a face onto a photo or video (Roop-FaceSwap).", placeholder: "" },
+              desc: "Put a face onto a photo or video (Changeling).", placeholder: "" },
 };
 const NEEDS_PHOTO = ["edit", "inpaint", "uncrop", "pose", "background", "relight", "upscale"];
 // Don't mention the grey padding here: told to "fill the grey border", the model paints grey.

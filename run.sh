@@ -11,5 +11,5 @@ else
     source "$VENV_DIR/bin/activate"
 fi
 
-echo "Starting AI Visual Workshop on http://127.0.0.1:7870"
+echo "Starting AetherCanvas AI on http://127.0.0.1:7870"
 python app.py

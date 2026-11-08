@@ -1,7 +1,7 @@
-"""Every model the Workshop knows, for the Models page: where each file comes from,
+"""Every model AetherCanvas knows, for the Models page: where each file comes from,
 how big it is, and the ComfyUI folder it goes in.
 
-"base" models are the Workshop's standard set; the rest are optional extras you can
+"base" models are AetherCanvas's standard set; the rest are optional extras you can
 download from the Models page. A model marked "test" is being tried out.
 Downloads go to this repo's models/<folder>/ (MODELS_DIR), which ComfyUI already
 reads through extra_model_paths.yaml, so a new file shows up without a restart.
@@ -118,15 +118,15 @@ CATALOG = [
      "files": [
          hf("Kim2091/UltraSharpV2", "4x-UltraSharpV2.safetensors", "upscale_models", 139792588),
      ]},
-    {"id": "roop", "name": "Roop face swap", "kind": "Tool", "base": False,
+    {"id": "changeling", "name": "Changeling face swap", "kind": "Tool", "base": False,
      "license": "Non-commercial research (insightface inswapper)",
      "note": "The Face Swap tool: inswapper puts a face onto a photo or video; GFPGAN cleans the "
-             "face up afterwards. Runs in Roop-FaceSwap's own venv, which also fetches its face "
+             "face up afterwards. Runs in Changeling's own venv, which also fetches its face "
              "finder (buffalo_l) the first time.",
      "files": [
-         hf("CountFloyd/deepfake", "inswapper_128.onnx", "roop", 554253681),
+         hf("CountFloyd/deepfake", "inswapper_128.onnx", "changeling", 554253681),
          {"url": "https://github.com/TencentARC/GFPGAN/releases/download/v1.3.4/GFPGANv1.4.pth",
-          "name": "GFPGANv1.4.pth", "folder": "roop", "size": 348632874, "repo": "TencentARC/GFPGAN"},
+          "name": "GFPGANv1.4.pth", "folder": "changeling", "size": 348632874, "repo": "TencentARC/GFPGAN"},
      ]},
 ]
 
