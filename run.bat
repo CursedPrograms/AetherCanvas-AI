@@ -2,16 +2,15 @@
 setlocal
 set "VENV_DIR=venv"
 
-if not exist "%VENV_DIR%" (
+set "PY=%~dp0%VENV_DIR%\Scripts\python.exe"
+if not exist "%PY%" (
     echo Creating virtual environment...
     python -m venv "%VENV_DIR%"
-    call "%VENV_DIR%\Scripts\activate" && pip install -r requirements.txt
-) else (
-    call "%VENV_DIR%\Scripts\activate"
+    "%PY%" -m pip install -r requirements.txt
 )
 
 call "%~dp0start_comfy.bat"
 
 echo Starting AetherCanvas AI on http://127.0.0.1:7870
-python app.py
+"%PY%" app.py
 pause

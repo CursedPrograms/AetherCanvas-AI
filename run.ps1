@@ -1,12 +1,11 @@
 $VenvDir = "venv"
 
-if (-not (Test-Path $VenvDir)) {
+# the venv's own python (not "activate", which keeps the folder's old path if the folder is ever moved)
+$Py = Join-Path $PSScriptRoot "$VenvDir\Scripts\python.exe"
+if (-not (Test-Path $Py)) {
     Write-Host "Creating virtual environment..."
     python -m venv $VenvDir
-    & "$VenvDir\Scripts\Activate.ps1"
-    pip install -r requirements.txt
-} else {
-    & "$VenvDir\Scripts\Activate.ps1"
+    & $Py -m pip install -r requirements.txt
 }
 
 # Start ComfyUI in its own window unless it already answers (see start_comfy.bat).
@@ -32,4 +31,4 @@ if ($ComfyServer -notmatch "127\.0\.0\.1|localhost") {
 }
 
 Write-Host "Starting AetherCanvas AI on http://127.0.0.1:7870"
-python app.py
+& $Py app.py

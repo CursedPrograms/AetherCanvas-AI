@@ -5,15 +5,14 @@ set "VENV_DIR=venv"
 set "HOST=0.0.0.0"
 set "PORT=7870"
 
-if not exist "%VENV_DIR%" (
+set "PY=%~dp0%VENV_DIR%\Scripts\python.exe"
+if not exist "%PY%" (
     python -m venv "%VENV_DIR%"
-    call "%VENV_DIR%\Scripts\activate" && pip install -r requirements.txt
-) else (
-    call "%VENV_DIR%\Scripts\activate"
+    "%PY%" -m pip install -r requirements.txt
 )
 
 call "%~dp0start_comfy.bat"
 
 echo Serving on http://0.0.0.0:%PORT%  (LAN: http://qwen.flask:%PORT%)
-python app.py
+"%PY%" app.py
 pause
