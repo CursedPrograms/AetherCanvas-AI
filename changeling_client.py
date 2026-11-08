@@ -15,7 +15,7 @@ from pathlib import Path
 
 from comfy_client import Cancelled, ComfyError
 
-CHANGELING_DIR = Path(os.environ.get("CHANGELING_DIR") or os.environ.get("CHANGELING_DIR") or r"D:\cc\Changeling")
+CHANGELING_DIR = Path(os.environ.get("CHANGELING_DIR") or os.environ.get("ROOP_DIR") or r"D:\cc\Changeling-CopyCat")
 MODELS = Path(os.environ.get("MODELS_DIR", Path(__file__).parent / "models")) / "changeling"
 SWAPPER, ENHANCER = "inswapper_128.onnx", "GFPGANv1.4.pth"
 IMAGE_TYPES = (".png", ".jpg", ".jpeg", ".webp", ".bmp")
