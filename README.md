@@ -84,8 +84,7 @@ optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
 </p>
 
 <p align="center">
-  <img src="docs/ui-model-info.jpg" alt="Model picker with an info card" width="49%">
-  <img src="docs/ui-models.jpg" alt="The Models page" width="49%">
+  <img src="docs/ui-models.jpg" alt="The Models page" width="100%">
 </p>
 
 ## 📖 Overview

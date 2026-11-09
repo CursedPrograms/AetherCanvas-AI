@@ -1,7 +1,7 @@
 /* AetherCanvas AI - GitHub Pages site. Same palette as the app (static/style.css). */
 :root {
-  --bg: #0f1115; --panel: #171a21; --panel2: #1e222b; --line: #2b303b;
-  --text: #e6e8ee; --sub: #9aa3b2; --accent: #7c5cff; --accent2: #00d2b8;
+  --bg: #1a1a1a; --panel: #242424; --panel2: #2b2b2b; --line: #3a3a3a;   /* the Changeling look */
+  --text: #e6e6e6; --sub: #9a9a9a; --accent: #e0408a; --accent2: #f29cc0;
   --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
 }
 * { box-sizing: border-box; }
@@ -19,20 +19,20 @@ code { font: 0.9em var(--mono); background: var(--panel2); border: 1px solid var
 
 /* hero */
 .hero { padding: 72px 0 24px; text-align: center;
-  background: radial-gradient(ellipse at top, rgba(124, 92, 255, .22), transparent 60%); }
+  }
 .eyebrow { font: 12px var(--mono); letter-spacing: .2em; text-transform: uppercase; color: var(--accent2); }
 h1 { font-size: clamp(36px, 7vw, 64px); line-height: 1.05; margin: 10px 0 6px;
-  background: linear-gradient(135deg, #fff, var(--accent) 60%, var(--accent2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  color: var(--accent); }
 .tagline { font-size: 20px; color: var(--sub); margin: 0 0 18px; }
 .lede { max-width: 680px; margin: 0 auto; color: var(--text); }
 .cta { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 26px; }
 .btn { padding: 10px 18px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font-weight: 600; }
 .btn:hover { text-decoration: none; border-color: var(--accent); }
-.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0b0c10; border: 0; }
+.btn.primary { background: #c2186b; color: #fff; border: 0; }
 .tags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 26px; }
 .tag { font: 12px var(--mono); color: var(--sub); border: 1px solid var(--line); padding: 3px 10px; border-radius: 999px; }
 .shot { margin: 40px auto 0; max-width: 900px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
-  background: var(--panel); box-shadow: 0 0 80px rgba(124, 92, 255, .18); }
+  background: var(--panel); }
 .shot img { display: block; width: 100%; height: auto; }
 .shot.wide { max-width: none; margin-top: 18px; box-shadow: none; }
 .shot figcaption { font: 12px var(--mono); color: var(--sub); padding: 8px 12px; text-align: left; letter-spacing: .1em; text-transform: uppercase; }
@@ -66,7 +66,7 @@ ol.steps li::marker { color: var(--accent); font-family: var(--mono); }
 
 /* GIF + text side by side */
 .pair { display: flex; flex-wrap: wrap; align-items: center; gap: 22px 30px; margin-top: 22px; }
-.pair .shot.gif { margin: 0; flex: 0 0 auto; max-width: 300px; box-shadow: 0 0 60px rgba(124, 92, 255, .25); }
+.pair .shot.gif { margin: 0; flex: 0 0 auto; max-width: 300px; }
 .pair-text { flex: 1 1 280px; }
 .pair-text .k { font: 11px var(--mono); letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
 .pair-text h3 { margin: 6px 0 10px; font-size: 22px; }

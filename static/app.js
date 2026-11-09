@@ -553,7 +553,7 @@ function drawUncrop() {
   uncropCanvas.width = g.W; uncropCanvas.height = g.H;
   const ctx = uncropCanvas.getContext("2d");
   ctx.drawImage(paddedCanvas(g), 0, 0);
-  ctx.setLineDash([12, 8]); ctx.lineWidth = Math.max(2, g.W / 300); ctx.strokeStyle = "#7c5cff";
+  ctx.setLineDash([12, 8]); ctx.lineWidth = Math.max(2, g.W / 300); ctx.strokeStyle = "#e0408a";
   ctx.strokeRect(g.x, g.y, g.pw, g.ph);
 }
 
