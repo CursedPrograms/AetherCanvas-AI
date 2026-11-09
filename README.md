@@ -23,7 +23,6 @@ models on your own GPU, and the ComfyUI workflows it runs on: Qwen-Image 2.1 (fr
 optional Krea 2 Turbo for text-to-image, and optional Wan 2.2 TI2V-5B for video.
 
 **Site:** [cursedprograms.github.io/AetherCanvas-AI](https://cursedprograms.github.io/AetherCanvas-AI/)
-· formerly *Qwen-Image-2.1-Uncensored-GGUF*.
 
 - **Generate** — text to image with Qwen-Image 2.1, **Krea 2 Turbo** (8 steps), **SDXL**
   (RealVisXL V5 Lightning, 6 steps, or any SDXL checkpoint) or **Chroma1-HD** (optional).
