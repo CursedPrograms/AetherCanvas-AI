@@ -664,9 +664,18 @@ def output(name):
 
 
 if __name__ == "__main__":
+    host, port = os.environ.get("HOST", "127.0.0.1"), int(os.environ.get("PORT", 7870))
+    # on the home network (run-lan.bat): the address and a QR code, to open it on a phone
+    if os.environ.get("WERKZEUG_RUN_MAIN") is None:   # once, not again in the debug reloader
+        import lan
+        url = lan.phone_url(port, host)
+        if url:
+            lan.print_qr(url, "AetherCanvas AI")
+        else:
+            print("\n  To open AetherCanvas AI on your phone, start it with run-lan.bat.\n")
     app.run(
-        host=os.environ.get("HOST", "127.0.0.1"),
+        host=host,
         # 7870: ports 5000-5999 belong to the DREAM Robotics fleet (RIFT is on 5000)
-        port=int(os.environ.get("PORT", 7870)),
+        port=port,
         debug=bool(os.environ.get("FLASK_DEBUG")),
     )
