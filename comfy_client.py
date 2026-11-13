@@ -373,6 +373,90 @@ def build_upscale_workflow(image, *, scale=2, model=UPSCALE_MODEL, prefix="upsca
     return wf, None
 
 
+# Enhance: a blurry or soft picture made sharp and real, the way Magnific does it. It's enlarged with the upscale
+# model, then repainted tile by tile with Krea 2 at a low strength (new skin, hair and fabric detail, the picture
+# itself kept), each tile feathered into the last. All in one ComfyUI graph, with ComfyUI's own nodes.
+ENHANCE_PROMPT = ("A sharp, detailed, realistic photograph. Natural skin texture with pores, individual hair strands, "
+                  "crisp fabric and material detail, real lighting, in focus.")
+
+
+def _tiles(size, tile, overlap):
+    """Tile starts along one side: tiles of `tile` pixels, at least `overlap` apart, the last flush with the edge."""
+    if size <= tile:
+        return [0]
+    n = max(2, -(-(size - overlap) // (tile - overlap)))   # ceil
+    step = (size - tile) / (n - 1)
+    return [int(round(i * step)) for i in range(n)]
+
+
+def build_detail_workflow(image, width, height, *, scale=2, creativity=0.2, prompt="", steps=5, tile=1024,
+                          overlap=128, seed=None, upscaler=UPSCALE_MODEL, unet="krea2_turbo_bf16-Q4_0.gguf",
+                          clip="qwen3vl_4b_fp8_scaled.safetensors", vae="qwen_image_vae.safetensors",
+                          prefix="enhance"):
+    """Patch nothing: build the Enhance graph for `image` (an uploaded filename, `width` x `height`).
+    scale 1, 2 or 4; creativity 0.1..0.75 (how much Krea may repaint); steps of the repaint; tile size and overlap
+    in pixels. Returns (workflow, seed)."""
+    scale = float(scale); creativity = float(creativity); steps = int(steps)
+    if scale not in (1.0, 2.0, 4.0):
+        raise ValueError("scale must be 1, 2 or 4")
+    if not 0.05 <= creativity <= 0.9:
+        raise ValueError("creativity must be between 0.05 and 0.9")
+    W, H = int(int(width) * scale) // 16 * 16, int(int(height) * scale) // 16 * 16
+    if W < 64 or H < 64:
+        raise ValueError("The picture is too small")
+    tile = max(256, min(int(tile), 2048)) // 16 * 16
+    tw, th = min(tile, W), min(tile, H)
+    overlap = max(16, min(int(overlap), min(tw, th) // 2))
+    seed = int(seed) if seed not in (None, "") else random.randint(0, MAX_SEED)
+    text = (prompt.strip() + ". " if prompt and prompt.strip() else "") + ENHANCE_PROMPT
+    wf = {
+        "1": {"class_type": "UnetLoaderGGUF", "inputs": {"unet_name": unet}},
+        "2": {"class_type": "CLIPLoader", "inputs": {"clip_name": clip, "type": "krea2", "device": "default"}},
+        "3": {"class_type": "VAELoader", "inputs": {"vae_name": vae}},
+        "4": {"class_type": "CLIPTextEncode", "inputs": {"text": text, "clip": ["2", 0]}},
+        "5": {"class_type": "ConditioningZeroOut", "inputs": {"conditioning": ["4", 0]}},
+        "10": {"class_type": "LoadImage", "inputs": {"image": image}},
+    }
+    src = ["10", 0]
+    if scale > 1:
+        wf["11"] = {"class_type": "UpscaleModelLoader", "inputs": {"model_name": upscaler}}
+        wf["12"] = {"class_type": "ImageUpscaleWithModel", "inputs": {"upscale_model": ["11", 0], "image": src}}
+        src = ["12", 0]
+    wf["13"] = {"class_type": "ImageScale", "inputs": {"image": src, "upscale_method": "lanczos", "width": W,
+                                                       "height": H, "crop": "disabled"}}
+    canvas = ["13", 0]
+    xs, ys = _tiles(W, tw, overlap), _tiles(H, th, overlap)
+    n, i = len(xs) * len(ys), 0
+    for r, y in enumerate(ys):
+        for c, x in enumerate(xs):
+            i += 1
+            k = 100 + i * 10
+            meta = {"phase": f"Tile {i} of {n}"}
+            wf[str(k)] = {"class_type": "ImageCrop", "inputs": {"image": ["13", 0], "width": tw, "height": th, "x": x, "y": y}, "_meta": meta}
+            wf[str(k + 1)] = {"class_type": "VAEEncode", "inputs": {"pixels": [str(k), 0], "vae": ["3", 0]}, "_meta": meta}
+            wf[str(k + 2)] = {"class_type": "KSampler", "inputs": {
+                "model": ["1", 0], "positive": ["4", 0], "negative": ["5", 0], "latent_image": [str(k + 1), 0],
+                "seed": (seed + i) % MAX_SEED, "steps": steps, "cfg": 1.0, "sampler_name": "euler", "scheduler": "simple",
+                "denoise": creativity}, "_meta": meta}
+            wf[str(k + 3)] = {"class_type": "VAEDecode", "inputs": {"samples": [str(k + 2), 0], "vae": ["3", 0]}, "_meta": meta}
+            wf[str(k + 4)] = {"class_type": "SolidMask", "inputs": {"value": 1.0, "width": tw, "height": th}, "_meta": meta}
+            # feather the sides that lie over tiles already placed (left and top), so no seams show
+            wf[str(k + 5)] = {"class_type": "FeatherMask", "inputs": {"mask": [str(k + 4), 0], "left": overlap if c else 0,
+                              "top": overlap if r else 0, "right": 0, "bottom": 0}, "_meta": meta}
+            wf[str(k + 6)] = {"class_type": "ImageCompositeMasked", "inputs": {
+                "destination": canvas, "source": [str(k + 3), 0], "x": x, "y": y, "resize_source": False,
+                "mask": [str(k + 5), 0]}, "_meta": meta}
+            canvas = [str(k + 6), 0]
+    wf["9"] = {"class_type": "SaveImage", "inputs": {"filename_prefix": prefix, "images": canvas}}
+    return wf, seed
+
+
+def detail(server, image_name, image_data, *, timeout=7200, on_progress=None, **params):
+    """Upload a picture and Enhance it (see build_detail_workflow)."""
+    stored = upload_image(server, _unique(image_name), image_data)
+    return _run(server, *build_detail_workflow(image=stored, **params), timeout=timeout, on_progress=on_progress)
+
+
 def _get(server, path, timeout=10):
     with urllib.request.urlopen(f"{server}{path}", timeout=timeout) as r:
         return json.load(r)
@@ -707,7 +791,7 @@ _PHASES = {
     "CheckpointLoaderSimple": "Loading models", "UpscaleModelLoader": "Loading models",
     "ResizeImageMaskNode": "Loading the photo",
     "SDPoseKeypointExtractor": "Finding the pose", "SDPoseDrawKeypoints": "Finding the pose",
-    "ImageUpscaleWithModel": "Upscaling", "ImageScaleBy": "Upscaling",
+    "ImageUpscaleWithModel": "Upscaling", "ImageScaleBy": "Upscaling", "ImageScale": "Upscaling",
     "LoadBackgroundRemovalModel": "Loading models", "FrameInterpolationModelLoader": "Loading models",
     "RemoveBackground": "Finding the subject", "FrameInterpolate": "Adding in-between frames",
     "LoadVideo": "Loading the video", "GetVideoComponents": "Loading the video",
@@ -721,7 +805,7 @@ def _phases(wf):
     video = any(n["class_type"] == "SaveVideo" for n in wf.values())
     phases = {}
     for nid, node in wf.items():
-        phase = _PHASES.get(node["class_type"], "Working")
+        phase = node.get("_meta", {}).get("phase") or _PHASES.get(node["class_type"], "Working")
         if phase == "Decoding":
             phase = "Decoding the video frames" if video else "Decoding the image"
         phases[nid] = phase

@@ -514,6 +514,36 @@ def upscale():
         ))
 
 
+@app.route("/api/detail", methods=["POST"])
+def detail():
+    """Enhance a picture (blurry or soft AI art made sharp and real): multipart form with an `image` file, its
+    `width` and `height`, and `scale` (1, 2, 4), `creativity` (0.1..0.75), `steps`, `tile`, `prompt`, `seed`."""
+    upload = request.files.get("image")
+    if not upload or not upload.filename:
+        return jsonify(error="An image file is required."), 400
+    f = request.form
+    try:
+        width, height = int(f.get("width", 0)), int(f.get("height", 0))
+    except ValueError:
+        width = height = 0
+    if width <= 0 or height <= 0:
+        return jsonify(error="The picture's size is missing."), 400
+    scale = f.get("scale", "2")
+    name = Path(upload.filename).name
+    quality = "best" if f.get("quality") == "best" else "fast"
+    return _run_job("detail", f"{name}: enhance ×{scale}", f.get("job"), f.get("client"), lambda on_progress:
+        comfy_client.detail(
+            COMFY_SERVER, name, upload.read(),
+            width=width, height=height, scale=scale,
+            creativity=f.get("creativity", 0.2), steps=f.get("steps", 5),
+            tile=f.get("tile", 1024), overlap=f.get("overlap", 128),
+            prompt=f.get("prompt", ""), seed=f.get("seed") or None,
+            upscaler=comfy_client.UPSCALE_MODELS[quality],
+            timeout=int(f.get("timeout", 7200)),
+            on_progress=on_progress,
+        ))
+
+
 @app.route("/api/enhance", methods=["POST"])
 def enhance():
     """Rewrite a short prompt into a detailed one with the local LLM (Ollama)."""
@@ -615,7 +645,7 @@ OUTPUT_KINDS = [
     ("Qwen_image_2.1_gguf_background", "Background"), ("Qwen_image_2.1_gguf_relight", "Relight"),
     ("Qwen_image_2.1_gguf", "Qwen-Image"), ("Krea2_turbo_gguf", "Krea 2"),
     ("Chroma1_HD_gguf", "Chroma"), ("SDXL", "SDXL"), ("pose_map", "Pose map"),
-    ("upscale", "Upscale"), ("cutout", "Cut out"), ("background_removed", "Video FX"),
+    ("upscale", "Upscale"), ("enhance", "Enhance"), ("cutout", "Cut out"), ("background_removed", "Video FX"),
     ("smooth", "Smooth"), ("faceswap", "Face swap"),
 ]
 IMAGE_TYPES = (".png", ".jpg", ".jpeg", ".webp")

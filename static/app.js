@@ -42,13 +42,16 @@ const MODES = {
               placeholder: "warm golden-hour sunlight from the left, long soft shadows" },
   upscale:  { label: "", button: "Upscale", busy: "Upscaling…", icon: "⇱",
               desc: "Enlarge a photo 2× or 4× with real added detail.", placeholder: "" },
+  detail:   { label: "What's in the picture (optional)", button: "Enhance", busy: "Enhancing…", icon: "✦",
+              desc: "Makes blurry or soft AI art sharp and realistic: enlarged, then repainted with real detail.",
+              placeholder: "a woman with freckles in a wool sweater, studio light" },
   video:    { label: "Describe the motion", button: "Make video", busy: "Rendering video…", icon: "▶",
               desc: "Bring a photo to life, or make a clip from text (Wan 2.2).",
               placeholder: "she slowly turns toward the camera and smiles, wind in her hair, slow push-in" },
   videofx:  { label: "", button: "Apply to video", busy: "Processing video…", icon: "◎",
               desc: "Smooth a video (RIFE in-between frames) or remove its background.", placeholder: "" },
 };
-const NEEDS_PHOTO = ["edit", "inpaint", "uncrop", "pose", "background", "relight", "upscale"];
+const NEEDS_PHOTO = ["edit", "inpaint", "uncrop", "pose", "background", "relight", "upscale", "detail"];
 // Don't mention the grey padding here: told to "fill the grey border", the model paints grey.
 const UNCROP_DEFAULT = "Extend the photo outward, seamlessly continuing the scene, with the same " +
   "lighting, perspective, colours and photographic style.";
@@ -272,7 +275,7 @@ function updateSubModes() {
   const removing = mode === "background" && bgMode === "remove";
   for (const key of ["prompt", "settings", "models"])
     document.querySelector(`[data-section="${key}"]`).hidden =
-      removing || ["upscale", "videofx"].includes(mode);
+      removing || ["upscale", "videofx"].includes(mode) || (mode === "detail" && key !== "prompt");
   if (mode === "background") {
     $("go").textContent = removing ? "Remove background" : "Replace background";
     $("bgHint").textContent = removing ? "Cuts out the subject as a transparent PNG (BiRefNet)."
@@ -309,6 +312,17 @@ vdrop.addEventListener("drop", (e) => {
   const file = [...e.dataTransfer.files].find((f) => f.type.startsWith("video/"));
   if (file) loadVideo(file);
 });
+
+// Enhance: its enlarge factor and sliders (each slider shows its value).
+let detailScale = "2";
+document.querySelectorAll("#dScaleSeg .seg-btn").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("#dScaleSeg .seg-btn").forEach((x) => x.classList.toggle("active", x === b));
+  detailScale = b.dataset.dscale;
+}));
+for (const id of ["dCreativity", "dSteps", "dTile", "dOverlap"]) {
+  const show = () => { $(id + "V").textContent = $(id).value; };
+  $(id).addEventListener("input", show); show();
+}
 
 // Upscale factor (2x / 4x segmented control).
 document.querySelectorAll("#scaleSeg .seg-btn").forEach((b) => b.addEventListener("click", () => {
@@ -553,7 +567,7 @@ function drawUncrop() {
   uncropCanvas.width = g.W; uncropCanvas.height = g.H;
   const ctx = uncropCanvas.getContext("2d");
   ctx.drawImage(paddedCanvas(g), 0, 0);
-  ctx.setLineDash([12, 8]); ctx.lineWidth = Math.max(2, g.W / 300); ctx.strokeStyle = "#e0408a";
+  ctx.setLineDash([12, 8]); ctx.lineWidth = Math.max(2, g.W / 300); ctx.strokeStyle = "#007bb7";
   ctx.strokeRect(g.x, g.y, g.pw, g.ph);
 }
 
@@ -813,6 +827,16 @@ async function buildRequest(prompt, job) {
     form.append("resolution", $("resolution").value);
     return ["/api/pose", { method: "POST", body: form }];
   }
+  if (mode === "detail") {
+    form.append("image", photoBlob, photoName);
+    form.append("width", photo.naturalWidth); form.append("height", photo.naturalHeight);
+    form.append("scale", detailScale);
+    form.append("creativity", $("dCreativity").value); form.append("steps", $("dSteps").value);
+    form.append("tile", $("dTile").value); form.append("overlap", $("dOverlap").value);
+    form.set("seed", $("dSeed").value);
+    form.append("quality", upscaleQuality);
+    return ["/api/detail", { method: "POST", body: form }];
+  }
   if (mode === "upscale") {
     form.append("image", photoBlob, photoName);
     form.append("scale", $("scale").value);
@@ -880,12 +904,13 @@ $("form").addEventListener("submit", async (e) => {
     prompt = prompt ? `${UNCROP_DEFAULT} The wider scene: ${prompt}` : UNCROP_DEFAULT;
   }
   if (mode === "upscale") prompt = `${photoName} ×${$("scale").value}`;
+  if (mode === "detail") { if (!photo) return fail("Choose a picture first."); prompt = prompt || ""; }
   if (mode === "background" && bgMode === "remove") prompt = `${photoName}: remove background`;
   if (mode === "videofx") {
     if (!videoBlob) return fail("Choose a video first.");
     prompt = fxMode === "smooth" ? `${videoName} ×${$("multiplier").value} smooth` : `${videoName}: remove background`;
   }
-  if (!prompt) return fail(mode === "edit" ? "Enter an edit instruction first." : "Enter a prompt first.");
+  if (!prompt && mode !== "detail") return fail(mode === "edit" ? "Enter an edit instruction first." : "Enter a prompt first.");
   msg.className = ""; msg.textContent = "";
 
   // Snapshot everything now, so changing the form afterwards doesn't affect this job.

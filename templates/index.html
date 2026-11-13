@@ -64,13 +64,14 @@
         <option value="background">Background</option>
         <option value="relight">Relight</option>
         <option value="upscale">Upscale</option>
+        <option value="detail">Enhance</option>
         <option value="video">Video</option>
         <option value="videofx">Video FX</option>
       </select>
     </div>
     <p class="mode-desc" id="modeDesc"></p>
 
-    <details class="section" data-section="photo" data-modes="edit inpaint uncrop pose background relight upscale video" open hidden>
+    <details class="section" data-section="photo" data-modes="edit inpaint uncrop pose background relight upscale detail video" open hidden>
       <summary id="photoLabel">Photo</summary>
       <div class="section-body">
         <label class="drop" for="image" id="drop">
@@ -82,7 +83,7 @@
           <button type="button" class="small" id="prevPhoto" hidden>&larr; Previous photo</button>
           <button type="button" class="small" id="clearPhoto" title="Remove the photo">&times;</button>
         </div>
-        <img id="preview" class="preview" alt="" data-modes="edit video pose upscale background relight" hidden>
+        <img id="preview" class="preview" alt="" data-modes="edit video pose upscale detail background relight" hidden>
         <div class="hint" data-modes="pose" hidden>A photo of someone in the pose you want. The new picture copies the pose, not the person.</div>
 
         <div data-modes="inpaint" hidden>
@@ -134,19 +135,44 @@
           <div class="hint" id="bgHint">Cuts out the subject as a transparent PNG (BiRefNet).</div>
         </div>
 
-        <div data-modes="upscale" hidden>
+        <div data-modes="detail" hidden>
+          <label>Enlarge</label>
+          <div class="seg" id="dScaleSeg">
+            <button type="button" class="seg-btn" data-dscale="1">1&times;</button>
+            <button type="button" class="seg-btn active" data-dscale="2">2&times;</button>
+            <button type="button" class="seg-btn" data-dscale="4">4&times;</button>
+          </div>
+          <label for="dCreativity">Creativity <span id="dCreativityV">0.2</span></label>
+          <input id="dCreativity" type="range" min="0.1" max="0.75" step="0.05" value="0.2">
+          <div class="hint">Low keeps the picture exactly and only sharpens it; high repaints more and invents more
+            detail (skin, hair, fabric), and can change small things. 0.2 keeps the same face; above 0.3 faces drift. Text and logos get redrawn, so add them back afterwards.</div>
+          <label for="dSteps">Steps <span id="dStepsV">5</span></label>
+          <input id="dSteps" type="range" min="2" max="12" step="1" value="5">
+          <label for="dTile">Tile size <span id="dTileV">1024</span> px</label>
+          <input id="dTile" type="range" min="512" max="1536" step="128" value="1024">
+          <label for="dOverlap">Tile overlap <span id="dOverlapV">128</span> px</label>
+          <input id="dOverlap" type="range" min="32" max="256" step="16" value="128">
+          <div class="hint">Krea 2 repaints the enlarged picture a tile at a time; smaller tiles are kinder to small
+            graphics cards, more overlap hides the joins better. A 1024 picture at 2&times; is 9 tiles: a few minutes.</div>
+          <label for="dSeed">Seed</label>
+          <input id="dSeed" type="number" placeholder="random" min="0">
+        </div>
+
+        <div data-modes="upscale detail" hidden>
+          <div data-modes="upscale">
           <label for="scale">Enlarge</label>
           <div class="seg" id="scaleSeg">
             <button type="button" class="seg-btn active" data-scale="2">2&times;</button>
             <button type="button" class="seg-btn" data-scale="4">4&times;</button>
           </div>
           <input type="hidden" id="scale" value="2">
+          </div>
           <label>Quality</label>
           <div class="seg" id="qualitySeg">
             <button type="button" class="seg-btn active" data-quality="fast">Fast</button>
             <button type="button" class="seg-btn" data-quality="best">Best (slow)</button>
           </div>
-          <div class="hint">4x-UltraSharp adds real detail, not just pixels. Fast takes seconds; Best looks a touch smoother but takes minutes. The result is saved at full size in <code>output/</code>.</div>
+          <div class="hint" data-modes="upscale">4x-UltraSharp adds real detail, not just pixels. Fast takes seconds; Best looks a touch smoother but takes minutes. The result is saved at full size in <code>output/</code>.</div>
         </div>
       </div>
     </details>
@@ -241,7 +267,7 @@
       </div>
     </details>
 
-    <details class="section" data-section="settings" data-not-modes="upscale videofx" open>
+    <details class="section" data-section="settings" data-not-modes="upscale detail videofx" open>
       <summary>Size &amp; quality</summary>
       <div class="section-body">
         <div data-modes="generate">
@@ -290,7 +316,7 @@
       </div>
     </details>
 
-    <details class="section" data-section="models" data-not-modes="upscale videofx">
+    <details class="section" data-section="models" data-not-modes="upscale detail videofx">
       <summary>Models &amp; LoRA</summary>
       <div class="section-body">
         <label for="unet">Diffusion model (GGUF)</label>
