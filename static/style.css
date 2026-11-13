@@ -1,10 +1,10 @@
 /* AetherCanvas AI - same palette as the project page (site/style.css). */
 :root {
-  /* the Changeling look (Changeling Studio's changeling.css): the apps' greys, the Cursed pink, solid colours */
+  /* the Changeling look (Changeling Studio's changeling.css): the apps' greys, the Atelier blue, solid colours */
   --bg: #1a1a1a; --panel: #242424; --panel2: #2b2b2b; --panel3: #333333; --line: #3a3a3a;
-  --text: #e6e6e6; --muted: #9a9a9a; --accent: #e0408a; --accent2: #f29cc0;
+  --text: #e6e6e6; --muted: #9a9a9a; --accent: #007bb7; --accent2: #34a9e3;
   --danger: #ff5c5c; --radius: 12px;
-  --grad: #c2186b;            /* (was a gradient: now the deeper pink, solid) */
+  --grad: #005184;            /* (was a gradient: now the deeper pink, solid) */
   --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
   --glow: 0 0 0 1px var(--accent);   /* a 1px ring, no glow */
 }
@@ -328,4 +328,4 @@ main.models-mode > .panel, main.models-mode > .gallery-wrap { display: none; }
 .quick-row { margin-top: 8px; }
 .quick-name { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
 .chip { width: auto; flex: 0 0 auto; padding: 5px 11px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); color: var(--text); font-weight: 600; font-size: 0.85rem; cursor: pointer; }
-.chip:hover { border-color: var(--accent, #e0408a); }
+.chip:hover { border-color: var(--accent, #007bb7); }
